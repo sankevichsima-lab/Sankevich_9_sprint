@@ -36,6 +36,14 @@ func maximum(data []int) int {
 
 // maxChunks returns the maximum number of elements in a chunks.
 func maxChunks(data []int) int {
+	if len(data) == 0 {
+		return 0
+	}
+
+	if len(data) < CHUNKS {
+		return slices.Max(data)
+	}
+
 	topMax := make([]int, CHUNKS)
 	var wg sync.WaitGroup
 
@@ -43,9 +51,11 @@ func maxChunks(data []int) int {
 	for i := 0; i < CHUNKS; i++ {
 		start := i * size
 		end := (i + 1) * size
+
 		if i == CHUNKS-1 {
 			end = len(data)
 		}
+
 		wg.Add(1)
 		go func(idx, s, e int) {
 			defer wg.Done()
