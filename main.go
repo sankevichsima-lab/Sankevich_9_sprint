@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 	"slices"
+	"sync"
 )
 
 const (
@@ -34,7 +35,22 @@ func maximum(data []int) int {
 
 // maxChunks returns the maximum number of elements in a chunks.
 func maxChunks(data []int) int {
-	// ваш код здесь
+	topMax := make([]int, CHUNKS)
+	var wg sync.WaitGroup
+
+	size := len(data) / CHUNKS
+	for i := 0; i < CHUNKS; i++ {
+		go func() {
+			wg.Add(1)
+			defer wg.Done()
+
+			res := slices.Max(data[i*size : i+size])
+			topMax = append(topMax, res)
+		}()
+	}
+	wg.Wait()
+	result := slices.Max(topMax)
+	return result
 }
 
 func main() {
