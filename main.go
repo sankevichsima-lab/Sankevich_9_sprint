@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	"slices"
 	"sync"
+	"time"
 )
 
 const (
@@ -40,13 +41,17 @@ func maxChunks(data []int) int {
 
 	size := len(data) / CHUNKS
 	for i := 0; i < CHUNKS; i++ {
-		go func() {
-			wg.Add(1)
+		start := i * size
+		end := (i + 1) * size
+		if i == CHUNKS-1 {
+			end = len(data)
+		}
+		wg.Add(1)
+		go func(idx, s, e int) {
 			defer wg.Done()
 
-			res := slices.Max(data[i*size : i+size])
-			topMax = append(topMax, res)
-		}()
+			topMax[idx] = slices.Max(data[s:e])
+		}(i, start, end)
 	}
 	wg.Wait()
 	result := slices.Max(topMax)
@@ -56,14 +61,18 @@ func maxChunks(data []int) int {
 func main() {
 	fmt.Printf("Генерируем %d целых чисел", SIZE)
 	// ваш код здесь
+	slice := make([]int, SIZE)
+	slice = generateRandomElements(SIZE)
 
+	startTime := time.Now()
 	fmt.Println("Ищем максимальное значение в один поток")
-	// ваш код здесь
+	max := maximum(slice)
+	elapsed := time.Since(startTime)
+	fmt.Printf("Максимальное значение элемента: %d\nВремя поиска: %d ms\n", max, elapsed.Microseconds())
 
-	fmt.Printf("Максимальное значение элемента: %d\nВремя поиска: %d ms\n", max, elapsed)
-
+	startTime = time.Now()
 	fmt.Printf("Ищем максимальное значение в %d потоков", CHUNKS)
-	// ваш код здесь
-
+	max = maxChunks(slice)
+	elapsed = time.Since(startTime)
 	fmt.Printf("Максимальное значение элемента: %d\nВремя поиска: %d ms\n", max, elapsed)
 }
