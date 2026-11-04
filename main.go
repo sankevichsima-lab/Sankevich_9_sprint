@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
+	"slices"
 )
 
 const (
@@ -11,12 +13,23 @@ const (
 
 // generateRandomElements generates random elements.
 func generateRandomElements(size int) []int {
-	// ваш код здесь
+	if size == 0 {
+		return nil
+	}
+	mas := make([]int, size)
+	for i := 0; i < size; i++ {
+		mas[i] = rand.Int()
+	}
+	return mas
 }
 
 // maximum returns the maximum number of elements.
 func maximum(data []int) int {
-	// ваш код здесь
+	if len(data) == 0 {
+		return 0
+	}
+	res := slices.Max(data)
+	return res
 }
 
 // maxChunks returns the maximum number of elements in a chunks.
