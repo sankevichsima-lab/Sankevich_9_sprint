@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"math/rand"
-	"slices"
 	"sync"
 	"time"
 )
@@ -30,8 +29,14 @@ func maximum(data []int) int {
 	if len(data) == 0 {
 		return 0
 	}
-	res := slices.Max(data)
-	return res
+
+	maxData := data[0]
+	for _, val := range data[1:] {
+		if val > maxData {
+			maxData = val
+		}
+	}
+	return maxData
 }
 
 // maxChunks returns the maximum number of elements in a chunks.
@@ -41,7 +46,7 @@ func maxChunks(data []int) int {
 	}
 
 	if len(data) < CHUNKS {
-		return slices.Max(data)
+		return maximum(data)
 	}
 
 	topMax := make([]int, CHUNKS)
@@ -60,12 +65,11 @@ func maxChunks(data []int) int {
 		go func(idx, s, e int) {
 			defer wg.Done()
 
-			topMax[idx] = slices.Max(data[s:e])
+			topMax[idx] = maximum(data[s:e])
 		}(i, start, end)
 	}
 	wg.Wait()
-	result := slices.Max(topMax)
-	return result
+	return maximum(topMax)
 }
 
 func main() {
